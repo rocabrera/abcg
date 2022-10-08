@@ -44,7 +44,7 @@ void Window::onPaintUI() {
   }
   {
     ImGui::SetNextWindowSize(ImVec2(500, 500));
-    // TODO como setar a posição da window? Existe um ImGui::SetNextWindowPosition? 
+    // TODO como setar a posição da window? Existe um ImGui::SetNextWindowPos? 
     ImGui::Begin("Exercise Window!");
 
     static bool enabled{false};
