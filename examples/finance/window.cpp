@@ -10,7 +10,7 @@ void Window::onCreate() {
   // Load font with bigger size for the X's and O's
   auto const filename{abcg::Application::getAssetsPath() +
                       "MontereyFLF.ttf"};
-  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 72.0f);
+  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 52.0f);
   if (m_font == nullptr) {
     throw abcg::RuntimeError{"Cannot load font file"};
   }
@@ -27,9 +27,12 @@ void print_text_introduction(float appWindowWidth, ImFont* m_font){
     ImGui::Text("%s", text.c_str());
     ImGui::PopFont();
     create_space();
-    text = "Welcome to the finance organizer program. Just write something to add in one of the available categories!";
-    ImGui::SetCursorPosX((appWindowWidth - ImGui::CalcTextSize(text.c_str()).x) / 2);
-    ImGui::Text("%s", text.c_str());
+    string text1 = "Welcome to the finance organizer program.";
+    string text2 = "Just write something to add in one of the available categories!";
+    ImGui::SetCursorPosX((appWindowWidth - ImGui::CalcTextSize(text1.c_str()).x) / 2);
+    ImGui::Text("%s", text1.c_str());
+    ImGui::SetCursorPosX((appWindowWidth - ImGui::CalcTextSize(text2.c_str()).x) / 2);
+    ImGui::Text("%s", text2.c_str());
 }
 
 size_t create_categorie_selector(vector<string> comboItems, float width_space){
@@ -92,6 +95,7 @@ void Window::onPaintUI() {
     auto const appWindowWidth{gsl::narrow<float>(getWindowSettings().width)};
     auto const appWindowHeight{gsl::narrow<float>(getWindowSettings().height)};
 
+    
     ImGui::SetNextWindowSize(ImVec2(appWindowWidth, appWindowHeight));
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     float width_categorie_holders = (appWindowWidth)/categories.size();
