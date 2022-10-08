@@ -1,6 +1,7 @@
 add_subdirectory(finance)
-add_subdirectory(helloworld)
+# add_subdirectory(helloworld)
 # add_subdirectory(firstapp)
 # add_subdirectory(tictactoe)
 # add_subdirectory(forca)
 # add_subdirectory(sierpinski)
+# add_subdirectory(coloredtriangles)
