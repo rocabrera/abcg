@@ -17,18 +17,22 @@ protected:
   // void onPaint() override;
   void onPaintUI() override;
 
-  float button_width_pct{0.35};
+  float button_width_pct{0.25};
   float button_height{50};
   char input_text[128] = "";
+  ImFont *m_font{};
 
   vector<string> categories{"Investiments", "Income", "Outcome"};
 
+  //Duvida: inicializar as chaves do mapa através de categories
   map<string, vector<string>> categories_mapper {
-    {"Investiments", {"test1", "batata1"}},
-    {"Income", {"test2"}},
-    {"Outcome", {"test3", "limao3", "pato3"}}
+    {"Investiments", {}},
+    {"Income", {}},
+    {"Outcome", {}}
   };
 
+  float available_X;
+  float button_offset;
 };
 
 #endif
