@@ -2,6 +2,9 @@
 #define WINDOW_HPP_
 
 #include "abcgOpenGL.hpp"
+#include <string>
+
+using namespace std;
 
 // DUVIDA:
 // Em comparação com o projeto firstapp, desta vez não substituímos o método onPaint. 
@@ -17,10 +20,14 @@ protected:
   float button_width_pct{0.35};
   float button_height{50};
   char input_text[128] = "";
-  // Duvida: se eu deixar o vetor aqui da ruim as vezes ...
-  std::vector<std::string> categories{"Investiments","Outcome", "Income"};
 
+  vector<string> categories{"Investiments", "Income", "Outcome"};
 
+  map<string, vector<string>> categories_mapper {
+    {"Investiments", {"test1", "batata1"}},
+    {"Income", {"test2"}},
+    {"Outcome", {"test3", "limao3", "pato3"}}
+  };
 
 };
 

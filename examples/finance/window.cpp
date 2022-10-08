@@ -1,5 +1,9 @@
 #include "window.hpp"
+#include "enumerate.hpp"
 #include "imgui.h"
+
+using namespace std;
+
 
 void Window::onCreate() {
   // Load font with bigger size for the X's and O's
@@ -11,9 +15,9 @@ void Window::onCreate() {
   // }
 }
 
-// void create_space(){
-//     ImGui::Dummy(ImVec2(0.0f, 10.0f));
-// }
+void create_space(){
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+}
 
 void print_text_introduction(){
     ImGui::Text("Introdução");
@@ -25,11 +29,12 @@ Depois Selecione Enter
 }
 
 
-std::size_t create_categorie_selector(std::vector<std::string> comboItems){
+size_t create_categorie_selector(vector<string> comboItems){
 
-    static std::size_t currentIndex{};
+    static size_t currentIndex{};
 
-    if (ImGui::BeginCombo("", comboItems.at(currentIndex).c_str())) {
+    // ImGui::PushItemWidth(200);
+    if (ImGui::BeginCombo("##categories", comboItems.at(currentIndex).c_str())) {
       for (auto index{0U}; index < comboItems.size(); ++index) {
         bool const isSelected{currentIndex == index};
         if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
@@ -39,11 +44,25 @@ std::size_t create_categorie_selector(std::vector<std::string> comboItems){
       }
       ImGui::EndCombo();
     }
+    // ImGui::PopItemWidth();
   
     return currentIndex;
 }
 
-void send_to_category(std::size_t combo_index, char text){
+
+void create_categories_holders(vector<string> categories, map<string, vector<string>> categories_mapper){
+    for (auto const &&[categorie_index, categorie] : iter::enumerate(categories)) {
+      vector<string> elements = categories_mapper[categorie];
+
+      if (ImGui::BeginListBox(fmt::format("##{}_listbox", categorie_index).c_str())){     
+            for (auto const &&[element_index, element] : iter::enumerate(elements)){
+                ImGui::Selectable(element.c_str());
+            }
+
+            ImGui::EndListBox();
+      }
+      ImGui::SameLine();
+    }
 }
 
 void Window::onPaintUI() {
@@ -57,44 +76,41 @@ void Window::onPaintUI() {
 
     auto const flags{ImGuiWindowFlags_MenuBar  | 
                      ImGuiWindowFlags_NoResize |
-                     ImGuiComboFlags_NoPreview | // Duvida: Porque essa flag não funciona
+                     ImGuiComboFlags_NoPreview |
                      ImGuiWindowFlags_NoCollapse};
 
     ImGui::Begin("Finance", nullptr, flags);
+
+    // Create Introduction Text
     print_text_introduction();
-    // create_space();
-    ImGui::InputText("", input_text, IM_ARRAYSIZE(input_text));
-    // create_space();
-    // Talvez trocar pelo Single Selection do Selection State
-    std::size_t icategorie = create_categorie_selector(categories);
-    fmt::print("Selected combo box item: {}\n", categories.at(icategorie));
-    // create_space();
+    create_space();
+
+    // Create Input Selector
+    ImGui::InputText("##inputtext", input_text, IM_ARRAYSIZE(input_text));
+    create_space();
+
+    // Create Categorie Selector
+    size_t icategorie = create_categorie_selector(categories);
+    create_space();
+
     if (ImGui::Button("Enter", ImVec2(appWindowWidth*button_width_pct, button_height))){
-      // send_to_category(combo_index, input_text)
-    }
 
+      // fmt::print("Selected combo box item: {}\n", categories.at(icategorie));
+
+      categories_mapper[categories.at(icategorie)].push_back(input_text);
+      
+      // for (auto const &element : categories_mapper[categories.at(icategorie)]) {
+      //   fmt::print("{}\n", element.c_str());
+      // }
+    }
     ImGui::SameLine();
-
     if (ImGui::Button("Erase", ImVec2(appWindowWidth*button_width_pct, button_height))){
-      // Clear text camp
-      // input_text = ""
-
-      // Unselect combo box
-      // ???
+    
     }
-    // create_space();
+    create_space();
 
-    // const char* items[] = { "Apple", "Banana", "Cherry"};
-    // static int item_current = 1;
+    create_categories_holders(categories, categories_mapper);
+    create_space();
 
-    // Ref: https://github.com/ocornut/imgui/issues/3531
-    for (auto const &categorie : categories) {
-      // ImGui::ListBox("", &item_current, items, IM_ARRAYSIZE(items), 4);
-      // Duvida: Porque os list box não ficam side by side?
-      ImGui::BeginListBox("test");
-      ImGui::EndListBox();
-      ImGui::SameLine();
-      fmt::print("Categorie: {}\n", categorie);
-    }
     ImGui::End();
 }
