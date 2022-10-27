@@ -80,19 +80,32 @@ void Window::onEvent(SDL_Event const &event) {
   }
 }
 
+float standardize(int x, int max_x) {
+  return (2.0*x)/max_x - 1.0;
+}
+
 void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
 
   {
     auto const widgetSize{ImVec2(200, 72)};
-    ImGui::SetNextWindowPos(ImVec2(m_viewportSize.x - widgetSize.x - 5,
-                                   m_viewportSize.y - widgetSize.y - 5));
+    auto const window_pos_x = m_viewportSize.x - widgetSize.x - 5;
+    auto const window_pos_y = m_viewportSize.y - widgetSize.y - 5;
+    ImGui::SetNextWindowPos(ImVec2(window_pos_x, window_pos_y));
+
+    // string s = fmt::format("window_pos_x:{};window_pos_y:{}\n", window_pos_x, window_pos_y);
+    // printf(s.c_str());
+
+
+    
     ImGui::SetNextWindowSize(widgetSize);
     auto const windowFlags{ImGuiWindowFlags_NoResize   |
                            ImGuiWindowFlags_NoCollapse |
                            ImGuiWindowFlags_NoTitleBar};
     ImGui::Begin(" ", nullptr, windowFlags);
-    string s = fmt::format("x:{};y:{}\n", x_position, y_position);
+    string s = fmt::format("x:{};y:{}\n", 
+                standardize(x_position, m_viewportSize.x),
+                standardize(y_position, m_viewportSize.y));
     printf(s.c_str());
     if (ImGui::Button("Clear window", ImVec2(-1, 30))) {
       // DUVIDA: porque esse comando limpa a tela?
@@ -117,7 +130,10 @@ void Window::onPaint() {
 
   // Pick a random xy position from (-1,-1) to (1,1)
   std::uniform_real_distribution rd1(-1.0f, 1.0f);
-  glm::vec2 const translation{x_position, y_position};
+  glm::vec2 const translation{
+    standardize(x_position, m_viewportSize.x), 
+    (-1.0)*standardize(y_position, m_viewportSize.y)
+  };
   // glm::vec2 const translation{rd1(x_position), rd1(y_position)};
   // glm::vec2 const translation{rd1(m_randomEngine), rd1(m_randomEngine)};
   auto const translationLocation{abcg::glGetUniformLocation(m_program, "translation")};
@@ -126,7 +142,7 @@ void Window::onPaint() {
   // Pick a random scale factor (1% to 25%)
   // std::uniform_real_distribution rd2(0.01f, 0.25f);
   // auto const scale{rd2(m_randomEngine)};
-  float scale{0.2};
+  float scale{0.01};
   auto const scaleLocation{abcg::glGetUniformLocation(m_program, "scale")};
   abcg::glUniform1f(scaleLocation, scale);
 
