@@ -23,45 +23,15 @@ Inicializa somente quando o programa é criado
 - Contém a definição do processo pós rasterização (fragmentShader)
 */
 void Window::onCreate() {
-  
-  // https://hbatagelo.github.io/cg/glpipeline.html
-  // DUVIDA: Processa cada vértice do VBO
-  // Uniform não variam de vértice para vértice e podem ser lidas pelo vertex shader e fragment shader
-  auto const *vertexShader{R"gl(#version 300 es 
+  auto const assetsPath{abcg::Application::getAssetsPath()};
 
-    layout(location = 0) in vec2 inPosition;
-    layout(location = 1) in vec4 inColor;
-
-    uniform vec2 translation;
-    uniform float scale;
-
-    out vec4 fragColor;
-
-    void main() {
-      vec2 newPosition = inPosition * scale + translation;
-      gl_Position = vec4(newPosition, 0, 1);
-      fragColor = inColor;
-    }
-  )gl"};
-
-  auto const *fragmentShader{R"gl(#version 300 es
-
-    precision mediump float;  
-
-    in vec4 fragColor;
-
-    out vec4 outColor;
-
-    void main() { outColor = fragColor; }
-  )gl"};
-
-  m_program = abcg::createOpenGLProgram(
-      {{.source = vertexShader, .stage = abcg::ShaderStage::Vertex},
-       {.source = fragmentShader, .stage = abcg::ShaderStage::Fragment}});
+  m_program = abcg::createOpenGLProgram({{.source = assetsPath + "pencil.vert",
+                                          .stage = abcg::ShaderStage::Vertex},
+                                          {.source = assetsPath + "pencil.frag",
+                                          .stage = abcg::ShaderStage::Fragment}});
 
   abcg::glClearColor(0, 0, 0, 1);
   abcg::glClear(GL_COLOR_BUFFER_BIT);
-
 }
 
 void Window::onEvent(SDL_Event const &event) {
