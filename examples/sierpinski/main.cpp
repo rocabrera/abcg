@@ -5,7 +5,8 @@ int main(int argc, char **argv) {
     abcg::Application app(argc, argv);
 
     Window window;
-    window.setOpenGLSettings({.samples = 2, .doubleBuffering = false});
+    // DUVIDA: Mesmo com o double buffering true ainda funciona
+    window.setOpenGLSettings({.samples = 2, .doubleBuffering = true});
     window.setWindowSettings({.width = 600,
                               .height = 600,
                               .showFullscreenButton = false,
