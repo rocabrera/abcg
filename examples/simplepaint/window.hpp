@@ -16,11 +16,20 @@ protected:
   void onDestroy() override;
 
 private:
+  
+  // Variable used to set when to draw in the window.
+  bool drawing{false};
 
+  // Variables used to get mouse position.
   float x_position{};
   float y_position{};
+
+  // Variable used to set pencil size
   float pencil_scale{0.2};
-  bool drawing{false};
+
+  // Variable used to set how many sides the polygon has
+  char input_text[128] = "20";
+  
   glm::ivec2 m_viewportSize{};
   glm::vec3 m_clearColor{0.906f, 0.910f, 0.918f};
 
@@ -28,8 +37,6 @@ private:
   GLuint m_VBOPositions{};
   GLuint m_VBOColors{};
   GLuint m_program{};
-
-  default_random_engine m_randomEngine;
 
   void setupModel(int sides);
 };

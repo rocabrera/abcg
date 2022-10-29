@@ -76,7 +76,9 @@ void Window::onPaintUI() {
     ImGui::PushItemWidth(210);
     ImGui::ColorEdit3("Pencil Color", &m_clearColor.r);
     ImGui::SliderFloat("Pencil Size", &pencil_scale, 0.0f, 1.0f);
+    ImGui::InputText("Polygon Side", input_text, IM_ARRAYSIZE(input_text));
     ImGui::PopItemWidth();
+
 
     if (ImGui::Button("Clear window", ImVec2(-1, 30))) {
       abcg::glClear(GL_COLOR_BUFFER_BIT);
@@ -87,10 +89,9 @@ void Window::onPaintUI() {
   }
 }
 
-
 void Window::onPaint() {
 
-  int sides{20};
+  int sides = atoi(input_text);
   if (drawing==true)
     setupModel(sides);
 
