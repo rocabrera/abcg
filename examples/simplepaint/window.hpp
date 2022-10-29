@@ -1,6 +1,7 @@
 #ifndef WINDOW_HPP_
 #define WINDOW_HPP_
 
+#include <cstddef>
 #include <random>
 
 #include "abcgOpenGL.hpp"
@@ -29,10 +30,17 @@ private:
 
   // Variable used to set how many sides the polygon has
   char input_text[128] = "20";
+
+  //
+  size_t idrawtype{0};
+
+  // DRA
+  vector<string> DRAW_TYPES{"GL_TRIANGLES", 
+                            "GL_TRIANGLE_FAN", 
+                            "GL_TRIANGLE_STRIP"};
   
   glm::ivec2 m_viewportSize{};
   glm::vec3 m_clearColor{0.906f, 0.910f, 0.918f};
-
   GLuint m_VAO{};
   GLuint m_VBOPositions{};
   GLuint m_VBOColors{};

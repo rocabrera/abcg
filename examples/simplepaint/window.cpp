@@ -1,5 +1,6 @@
 #include "window.hpp"
 #include "imgui.h"
+#include <cstddef>
 
 /*
 Padrao
@@ -57,6 +58,22 @@ float mouse_position_standardize(int x, int max_x) {
   return (2.0*x)/max_x - 1.0;
 }
 
+size_t create_categorie_selector(vector<string> draw_types, size_t &currentIndex){
+
+    if (ImGui::BeginCombo("##categories", draw_types.at(currentIndex).c_str())) {
+      for (auto index{0U}; index < draw_types.size(); ++index) {
+        bool const isSelected{currentIndex == index};
+        if (ImGui::Selectable(draw_types.at(index).c_str(), isSelected))
+          currentIndex = index;
+        if (isSelected)
+          ImGui::SetItemDefaultFocus();
+      }
+      ImGui::EndCombo();
+    }
+  
+    return currentIndex;
+}
+
 void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
   {
@@ -77,8 +94,8 @@ void Window::onPaintUI() {
     ImGui::ColorEdit3("Pencil Color", &m_clearColor.r);
     ImGui::SliderFloat("Pencil Size", &pencil_scale, 0.0f, 1.0f);
     ImGui::InputText("Polygon Side", input_text, IM_ARRAYSIZE(input_text));
+    create_categorie_selector(DRAW_TYPES, idrawtype);
     ImGui::PopItemWidth();
-
 
     if (ImGui::Button("Clear window", ImVec2(-1, 30))) {
       abcg::glClear(GL_COLOR_BUFFER_BIT);
@@ -111,9 +128,17 @@ void Window::onPaint() {
 
   // Render
   abcg::glBindVertexArray(m_VAO);
-  abcg::glDrawArrays(GL_TRIANGLE_FAN, 0, sides + 2);
-  abcg::glBindVertexArray(0);
+  string draw_type = DRAW_TYPES.at(idrawtype);
 
+  if (draw_type == "GL_TRIANGLES"){
+    abcg::glDrawArrays(GL_TRIANGLES, 0, sides + 2);
+  } else if (draw_type == "GL_TRIANGLE_FAN"){
+    abcg::glDrawArrays(GL_TRIANGLE_FAN, 0, sides + 2);
+  } else if (draw_type == "GL_TRIANGLE_STRIP"){
+    abcg::glDrawArrays(GL_TRIANGLE_STRIP, 0, sides + 2);
+  }
+
+  abcg::glBindVertexArray(0);
   abcg::glUseProgram(0);
 }
 
