@@ -53,7 +53,7 @@ void Window::onEvent(SDL_Event const &event) {
 }
 
 // Responsavel por converter as coordenadas do mouse para dentro do intervalo [-1,1]
-float standardize(int x, int max_x) {
+float mouse_position_standardize(int x, int max_x) {
   return (2.0*x)/max_x - 1.0;
 }
 
@@ -91,7 +91,6 @@ void Window::onPaintUI() {
 void Window::onPaint() {
 
   int sides{20};
-  // auto const sides{intDist(m_randomEngine)};
   if (drawing==true)
     setupModel(sides);
 
@@ -99,19 +98,15 @@ void Window::onPaint() {
   abcg::glUseProgram(m_program);
 
   glm::vec2 const translation{
-    standardize(x_position, m_viewportSize.x), 
-    (-1.0)*standardize(y_position, m_viewportSize.y)
+             mouse_position_standardize(x_position, m_viewportSize.x), 
+    (-1.0) * mouse_position_standardize(y_position, m_viewportSize.y)
   };
-  // glm::vec2 const translation{rd1(x_position), rd1(y_position)};
-  // glm::vec2 const translation{rd1(m_randomEngine), rd1(m_randomEngine)};
   auto const translationLocation{abcg::glGetUniformLocation(m_program, "translation")};
   abcg::glUniform2fv(translationLocation, 1, &translation.x);
 
-  // Pick a random scale factor (1% to 25%)
-  // std::uniform_real_distribution rd2(0.01f, 0.25f);
-  // auto const scale{rd2(m_randomEngine)};
   auto const scaleLocation{abcg::glGetUniformLocation(m_program, "scale")};
-  abcg::glUniform1f(scaleLocation, pencil_scale);
+  // Improve better pencil size
+  abcg::glUniform1f(scaleLocation, pencil_scale * 0.1);
 
   // Render
   abcg::glBindVertexArray(m_VAO);
