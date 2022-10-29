@@ -60,7 +60,7 @@ float mouse_position_standardize(int x, int max_x) {
 
 size_t create_categorie_selector(vector<string> draw_types, size_t &currentIndex){
 
-    if (ImGui::BeginCombo("##categories", draw_types.at(currentIndex).c_str())) {
+    if (ImGui::BeginCombo("Draw Type", draw_types.at(currentIndex).c_str())) {
       for (auto index{0U}; index < draw_types.size(); ++index) {
         bool const isSelected{currentIndex == index};
         if (ImGui::Selectable(draw_types.at(index).c_str(), isSelected))
@@ -128,8 +128,8 @@ void Window::onPaint() {
 
   // Render
   abcg::glBindVertexArray(m_VAO);
-  string draw_type = DRAW_TYPES.at(idrawtype);
 
+  string draw_type = DRAW_TYPES.at(idrawtype);
   if (draw_type == "GL_TRIANGLES"){
     abcg::glDrawArrays(GL_TRIANGLES, 0, sides + 2);
   } else if (draw_type == "GL_TRIANGLE_FAN"){
