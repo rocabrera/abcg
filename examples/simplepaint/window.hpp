@@ -19,8 +19,10 @@ private:
 
   float x_position{};
   float y_position{};
+  float pencil_scale{0.01};
   bool drawing{false};
   glm::ivec2 m_viewportSize{};
+  glm::vec3 m_clearColor{0.906f, 0.910f, 0.918f};
 
   GLuint m_VAO{};
   GLuint m_VBOPositions{};

@@ -1,4 +1,5 @@
 #include "window.hpp"
+#include "imgui.h"
 
 /*
 Padrao
@@ -34,6 +35,9 @@ void Window::onCreate() {
   abcg::glClear(GL_COLOR_BUFFER_BIT);
 }
 
+/*
+Atualiza a posição do mouse quando clicamos.
+*/
 void Window::onEvent(SDL_Event const &event) {
   
   if (event.type == SDL_MOUSEBUTTONDOWN)
@@ -45,61 +49,55 @@ void Window::onEvent(SDL_Event const &event) {
     SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
     x_position = mousePosition.x;
     y_position = mousePosition.y;
-    // string s = fmt::format("x:{};y:{}\n", mousePosition.x, mousePosition.y);
-    // printf(s.c_str());
   }
 }
 
+// Responsavel por converter as coordenadas do mouse para dentro do intervalo [-1,1]
 float standardize(int x, int max_x) {
   return (2.0*x)/max_x - 1.0;
 }
 
 void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
-
   {
-    auto const widgetSize{ImVec2(200, 72)};
+    auto const widgetSize{ImVec2(330, 200)};
     auto const window_pos_x = m_viewportSize.x - widgetSize.x - 5;
     auto const window_pos_y = m_viewportSize.y - widgetSize.y - 5;
     ImGui::SetNextWindowPos(ImVec2(window_pos_x, window_pos_y));
 
-    // string s = fmt::format("window_pos_x:{};window_pos_y:{}\n", window_pos_x, window_pos_y);
-    // printf(s.c_str());
-
-
-    
     ImGui::SetNextWindowSize(widgetSize);
     auto const windowFlags{ImGuiWindowFlags_NoResize   |
                            ImGuiWindowFlags_NoCollapse |
                            ImGuiWindowFlags_NoTitleBar};
+
     ImGui::Begin(" ", nullptr, windowFlags);
-    string s = fmt::format("x:{};y:{}\n", 
-                standardize(x_position, m_viewportSize.x),
-                standardize(y_position, m_viewportSize.y));
-    printf(s.c_str());
+
+    // Edit background color
+    ImGui::PushItemWidth(210);
+    ImGui::ColorEdit3("Pencil Color", &m_clearColor.r);
+    ImGui::SliderFloat("Pencil Size", &pencil_scale, 0.0f, 1.0f);
+    ImGui::PopItemWidth();
+
     if (ImGui::Button("Clear window", ImVec2(-1, 30))) {
-      // DUVIDA: porque esse comando limpa a tela?
       abcg::glClear(GL_COLOR_BUFFER_BIT);
     }
 
     ImGui::End();
+
   }
 }
 
+
 void Window::onPaint() {
 
-  // Create a regular polygon with number of sides in the range [3,20]
-  // std::uniform_int_distribution intDist(3, 20);
   int sides{20};
   // auto const sides{intDist(m_randomEngine)};
-  setupModel(sides);
+  if (drawing==true)
+    setupModel(sides);
 
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
-
   abcg::glUseProgram(m_program);
 
-  // Pick a random xy position from (-1,-1) to (1,1)
-  std::uniform_real_distribution rd1(-1.0f, 1.0f);
   glm::vec2 const translation{
     standardize(x_position, m_viewportSize.x), 
     (-1.0)*standardize(y_position, m_viewportSize.y)
@@ -112,9 +110,8 @@ void Window::onPaint() {
   // Pick a random scale factor (1% to 25%)
   // std::uniform_real_distribution rd2(0.01f, 0.25f);
   // auto const scale{rd2(m_randomEngine)};
-  float scale{0.01};
   auto const scaleLocation{abcg::glGetUniformLocation(m_program, "scale")};
-  abcg::glUniform1f(scaleLocation, scale);
+  abcg::glUniform1f(scaleLocation, pencil_scale);
 
   // Render
   abcg::glBindVertexArray(m_VAO);
@@ -130,13 +127,6 @@ void Window::setupModel(int sides) {
   abcg::glDeleteBuffers(1, &m_VBOColors);
   abcg::glDeleteVertexArrays(1, &m_VAO);
 
-  // Select random colors for the radial gradient
-  std::uniform_real_distribution rd(0.0f, 1.0f);
-  glm::vec3 const color1{rd(m_randomEngine), rd(m_randomEngine),
-                         rd(m_randomEngine)};
-  glm::vec3 const color2{rd(m_randomEngine), rd(m_randomEngine),
-                         rd(m_randomEngine)};
-
   // Minimum number of sides is 3
   sides = std::max(3, sides);
 
@@ -147,18 +137,18 @@ void Window::setupModel(int sides) {
   // DUVIDA: Nao entendi esse comando
   positions.emplace_back(0, 0);
   // DUVIDA: Nao entendi esse comando
-  colors.push_back(color1);
+  colors.push_back(m_clearColor);
 
   // Border vertices
   auto const step{M_PI * 2 / sides};
   for (auto const angle : iter::range(0.0, M_PI * 2, step)) {
     positions.emplace_back(std::cos(angle), std::sin(angle));
-    colors.push_back(color2);
+    colors.push_back(m_clearColor);
   }
 
   // Duplicate second vertex
   positions.push_back(positions.at(1));
-  colors.push_back(color2);
+  colors.push_back(m_clearColor);
 
   // Generate VBO of positions
   abcg::glGenBuffers(1, &m_VBOPositions);
