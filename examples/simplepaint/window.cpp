@@ -128,6 +128,8 @@ void Window::onPaint() {
   if (m_timer.elapsed() < m_delay / 1000.0){
     if (is_spinning == true)
       angular_shift += 0.5;
+    if (angular_shift == 360.0)
+      angular_shift = 0;
   }
   m_timer.restart();
 
@@ -183,9 +185,7 @@ void Window::setupModel(int sides) {
   std::vector<glm::vec3> colors;
 
   // Polygon center
-  // DUVIDA: Nao entendi esse comando
   positions.emplace_back(0, 0);
-  // DUVIDA: Nao entendi esse comando
   colors.push_back(m_clearColor);
 
   // Border vertices
