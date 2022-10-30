@@ -34,7 +34,6 @@ void Window::onCreate() {
 
   abcg::glClearColor(0, 0, 0, 1);
   abcg::glClear(GL_COLOR_BUFFER_BIT);
-
 }
 
 /*
@@ -75,6 +74,8 @@ size_t create_categorie_selector(vector<string> draw_types, size_t &currentIndex
     return currentIndex;
 }
 
+
+// Responsavel por desenhar a parte de UI que contém os elementos que pegam input do usuário.
 void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
   {
@@ -94,15 +95,25 @@ void Window::onPaintUI() {
     ImGui::Begin(" ", nullptr, windowFlags);
 
     // Edit background color
-    ImGui::PushItemWidth(210);
+    ImGui::PushItemWidth(200);
     ImGui::ColorEdit3("Pencil Color", &m_clearColor.r, colorEditFlags);
+    ImGui::Dummy(ImVec2(0.0f, 0.8f));
+    
     ImGui::SliderFloat("Pencil Size", &pencil_scale, 0.0f, 1.0f);
+    ImGui::Dummy(ImVec2(0.0f, 0.8f));
+
     ImGui::InputText("Polygon Side", polygon_sides, IM_ARRAYSIZE(polygon_sides));
-    ImGui::Checkbox("Geometry Spinning", &is_spinning);
+    ImGui::Dummy(ImVec2(0.0f, 0.8f));
+
     create_categorie_selector(DRAW_TYPES, idrawtype);
+    ImGui::Dummy(ImVec2(0.0f, 0.8f));
+
+    ImGui::Checkbox("Spinning Geometry", &is_spinning);
     ImGui::PopItemWidth();
 
-    if (ImGui::Button("Clear window", ImVec2(-1, 30))) {
+    ImGui::Dummy(ImVec2(0.0f, 8.0f));
+
+    if (ImGui::Button("Clear window", ImVec2(-1, 25))) {
       abcg::glClear(GL_COLOR_BUFFER_BIT);
     }
 
@@ -113,9 +124,10 @@ void Window::onPaintUI() {
 
 void Window::onPaint() {
 
+  // Responsável por incrementar a variavel que altera os ângulos dos vértives
   if (m_timer.elapsed() < m_delay / 1000.0){
     if (is_spinning == true)
-      angular_shift += 1.0;
+      angular_shift += 0.5;
   }
   m_timer.restart();
 
@@ -127,6 +139,7 @@ void Window::onPaint() {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
   abcg::glUseProgram(m_program);
 
+  // Nessa parte atualizamos os parâmetros uniformes do Vertex Shader
   glm::vec2 const translation{
              mouse_position_standardize(x_position, m_viewportSize.x), 
     (-1.0) * mouse_position_standardize(y_position, m_viewportSize.y)
@@ -143,6 +156,7 @@ void Window::onPaint() {
   // Render
   abcg::glBindVertexArray(m_VAO);
 
+  // Define primitiva
   string draw_type = DRAW_TYPES.at(idrawtype);
   if (draw_type == "GL_TRIANGLES"){
     abcg::glDrawArrays(GL_TRIANGLES, 0, sides + 2);
