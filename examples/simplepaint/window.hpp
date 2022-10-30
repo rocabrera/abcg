@@ -21,6 +21,9 @@ private:
   // Variable used to set when to draw in the window.
   bool drawing{false};
 
+  // Spinning
+  bool is_spinning{};
+
   // Variables used to get mouse position.
   float x_position{};
   float y_position{};
@@ -28,11 +31,16 @@ private:
   // Variable used to set pencil size
   float pencil_scale{0.2};
 
+  // Variable used to set angular shift in a vertice
+  float angular_shift{0.0};
+
   // Variable used to set how many sides the polygon has
-  char input_text[128] = "20";
+  char polygon_sides[128] = "3";
+
+
 
   //
-  size_t idrawtype{0};
+  size_t idrawtype{1};
 
   // DRA
   vector<string> DRAW_TYPES{"GL_TRIANGLES", 
@@ -45,6 +53,9 @@ private:
   GLuint m_VBOPositions{};
   GLuint m_VBOColors{};
   GLuint m_program{};
+
+  abcg::Timer m_timer;
+  int m_delay{1000};
 
   void setupModel(int sides);
 };

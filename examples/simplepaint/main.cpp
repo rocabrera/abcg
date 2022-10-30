@@ -7,8 +7,8 @@ int main(int argc, char **argv) {
     Window window;
     window.setOpenGLSettings({.samples = 4, .doubleBuffering = false});
     window.setWindowSettings({
-        .width = 2000,
-        .height = 2000,
+        .width = 4000,
+        .height = 4000,
         .title = "Simple Paint",
     });
 

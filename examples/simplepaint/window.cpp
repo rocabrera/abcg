@@ -34,6 +34,7 @@ void Window::onCreate() {
 
   abcg::glClearColor(0, 0, 0, 1);
   abcg::glClear(GL_COLOR_BUFFER_BIT);
+
 }
 
 /*
@@ -87,13 +88,17 @@ void Window::onPaintUI() {
                            ImGuiWindowFlags_NoCollapse |
                            ImGuiWindowFlags_NoTitleBar};
 
+    auto colorEditFlags{ImGuiColorEditFlags_NoTooltip |
+                        ImGuiColorEditFlags_NoPicker};
+
     ImGui::Begin(" ", nullptr, windowFlags);
 
     // Edit background color
     ImGui::PushItemWidth(210);
-    ImGui::ColorEdit3("Pencil Color", &m_clearColor.r);
+    ImGui::ColorEdit3("Pencil Color", &m_clearColor.r, colorEditFlags);
     ImGui::SliderFloat("Pencil Size", &pencil_scale, 0.0f, 1.0f);
-    ImGui::InputText("Polygon Side", input_text, IM_ARRAYSIZE(input_text));
+    ImGui::InputText("Polygon Side", polygon_sides, IM_ARRAYSIZE(polygon_sides));
+    ImGui::Checkbox("Geometry Spinning", &is_spinning);
     create_categorie_selector(DRAW_TYPES, idrawtype);
     ImGui::PopItemWidth();
 
@@ -108,7 +113,14 @@ void Window::onPaintUI() {
 
 void Window::onPaint() {
 
-  int sides = atoi(input_text);
+  if (m_timer.elapsed() < m_delay / 1000.0){
+    if (is_spinning == true)
+      angular_shift += 1.0;
+  }
+  m_timer.restart();
+
+  int sides = atoi(polygon_sides);
+
   if (drawing==true)
     setupModel(sides);
 
@@ -123,8 +135,10 @@ void Window::onPaint() {
   abcg::glUniform2fv(translationLocation, 1, &translation.x);
 
   auto const scaleLocation{abcg::glGetUniformLocation(m_program, "scale")};
-  // Improve better pencil size
   abcg::glUniform1f(scaleLocation, pencil_scale * 0.1);
+
+  auto const angleLocation{abcg::glGetUniformLocation(m_program, "angle")};
+  abcg::glUniform1f(angleLocation, glm::radians(angular_shift));
 
   // Render
   abcg::glBindVertexArray(m_VAO);
